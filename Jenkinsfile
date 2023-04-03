@@ -57,7 +57,7 @@ pipeline {
 
         stage ("Bonus Bonus stage") {
             steps {
-                echo "tenth step"
+                echo "final step"
             }
         }
     }
