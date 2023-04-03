@@ -45,19 +45,19 @@ pipeline {
 
         stage ("Production stage 2") {
             steps {
-                echo "eigth stage"
+                echo "eigth step"
             }
         }
 
         stage ("Bonus stage") {
             steps {
-                echo "ninth stage"
+                echo "ninth step"
             }
         }
 
         stage ("Bonus Bonus stage") {
             steps {
-                echo "tenth stage"
+                echo "tenth step"
             }
         }
     }
