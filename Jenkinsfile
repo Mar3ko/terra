@@ -1,63 +1,65 @@
 pipeline {
     agent any
+    tools {
+     'maven' 'maven'
+     
+     'hudson.plugins.sonar.SonarRunnerInstallation' 'Sonar1'
+    }
+    
     stages {
-        stage ("Build stage") {
+        stage ('git version check') {
             steps {
-                echo "first step"
+                sh 'git --version'
             }
         }
-
-        stage ("Testing stage") {
+        
+        stage ('maven version check') {
             steps {
-                echo "second step"
+                sh 'mvn --version'
             }
         }
-
-        stage ("Testing stage 2") {
+        
+        stage ('git checkout stage') {
             steps {
-                echo "third step"
+                git 'https://github.com/Divyabd/Jenkins-Full-Course-on-aws-Linux.git'
             }
         }
-
-        stage ("Staging stage") {
+        
+        stage ('adding credential for SonarQ Analysis') {
             steps {
-                echo "fourth step"
+              withSonarQubeEnv(installationName:'Sonar1', credentialsId: 'sonarQcred') {
+                sh 'mvn -f Maven/pom.xml clean package sonar:sonar' 
+              }
             }
         }
-
-        stage ("Staging stage 2") {
+        
+        // stage ('maven test') {
+        //     steps {
+        //         sh 'mvn -f Maven/pom.xml clean package'
+        //     }
+        // }
+        
+        stage ('jfrog connect test') {
             steps {
-                echo "fifth step"
+                rtUpload (
+                    serverId: 'jfrogCon1',
+                    spec: '''{
+                          "files": [
+                            {
+                              "pattern": "Maven/target/*.jar",
+                              "target": "libs-snapshot-local/com/devopspract/DevopsMaven/1.0-SNAPSHOT/"
+                            }
+                         ]
+                    }''',
+                )
             }
         }
-
-        stage ("Staging stage 3") {
+        
+        stage ('jfrog publish test') {
             steps {
-                echo "sixth step"
-            }
-        }
-
-        stage ("Production stage") {
-            steps {
-                echo "seventh step"
-            }
-        }
-
-        stage ("Production stage 2") {
-            steps {
-                echo "eigth step"
-            }
-        }
-
-        stage ("Bonus stage") {
-            steps {
-                echo "ninth step"
-            }
-        }
-
-        stage ("Bonus Bonus stage") {
-            steps {
-                echo "final step"
+                rtPublishBuildInfo (
+                serverId: 'jfrogCon1',
+            )
             }
         }
     }
